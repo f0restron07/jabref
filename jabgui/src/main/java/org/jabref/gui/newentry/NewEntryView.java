@@ -152,10 +152,21 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         generateButton.getStyleClass().add("customGenerateButton");
 
         final Stage stage = (Stage) getDialogPane().getScene().getWindow();
-        stage.setHeight(650);
         stage.setWidth(931);
         stage.setMinHeight(300);
         stage.setMinWidth(400);
+
+        // The dialog auto-sizes its height to fit all entry types, so it opens large enough to show
+        // every type by default (see https://github.com/JabRef/jabref/issues/11589). When the
+        // content is taller than the screen, we cap the height and rely on the ScrollPane in the
+        // "Choose Entry Type" tab to keep every type reachable.
+        stage.setOnShown(_ -> {
+            final double maxHeight = Screen.getPrimary().getVisualBounds().getHeight() * 0.9;
+            if (stage.getHeight() > maxHeight) {
+                stage.setHeight(maxHeight);
+                stage.centerOnScreen();
+            }
+        });
 
         ControlHelper.setAction(generateButtonType, getDialogPane(), _ -> execute());
         setOnCloseRequest(_ -> cancel());
